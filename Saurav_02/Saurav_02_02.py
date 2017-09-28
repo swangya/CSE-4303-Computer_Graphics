@@ -17,6 +17,7 @@ class cl_widgets:
         self.menu = cl_menu(self)
         self.toolbar = cl_toolbar(self)
 
+        self.scale_bar = cl_scale_bar(self)
         self.translate_bar = cl_translate_bar(self)
 
         self.buttons_panel_01 = cl_buttons_panel_01(self)
@@ -28,7 +29,7 @@ class cl_widgets:
         self.ob_canvas_frame = cl_canvas_frame(self)
         self.ob_world.add_canvas(self.ob_canvas_frame.canvas)
         self.lines = []
-        self.flg = 0;
+        self.flg = 0
 
 
 class cl_canvas_frame:
@@ -134,14 +135,84 @@ class cl_canvas_frame:
         self.canvas.pack()
         self.master.ob_world.redisplay(self.master.ob_canvas_frame.canvas, event)
 
+'''
+***************************************************************************
+
+***************************************************************************
+
+class cl_rotate_bar:
+    def __init__(self, master):
+        self.points = tk.StringVar()
+        self.points.set('')
+        self.master = master
+        self.translation = tk.Frame(master.ob_root_window)
+        self.heading = tk.Label(self.translation, text="Rotate ---> Enter Point A space seperated ").pack(side=tk.LEFT)
+        self.heading = tk.Label(self.translation, text="B: ").pack(side=tk.LEFT)
+        self.heading = tk.Label(self.translation, text="Degrees: ").pack(side=tk.LEFT)
+        self.entry = tk.Entry(self.translation, textvariable=self.points, width=25).pack(side=tk.LEFT)
+        self.translatePoints = list(self.points.get())
+        self.button = tk.Button(self.translation, text="Translate", width=16, command=self.activate)
+        self.button.pack(side=tk.RIGHT, padx=2, pady=2)
+        self.translation.pack(side=tk.TOP, fill=tk.X)
+
+    def activate(self):
+        self.translatePoints = list(self.points.get())
+        self.translatePoints = [x for x in self.translatePoints if x != ' ']
+        
+***************************************************************************
+
+***************************************************************************
+'''
+
+class cl_scale_bar:
+    def __init__(self, master):
+        self.points = tk.StringVar()
+        self.points.set('')
+        self.scaleFactor = tk.StringVar()
+        self.scaleFactor.set('')
+        self.master = master
+        self.scale = tk.Frame(master.ob_root_window)
+        self.heading = tk.Label(self.scale, text="Scaling ---> Enter Point space separated: ").pack(side=tk.LEFT)
+        self.entry = tk.Entry(self.scale, textvariable=self.points, width=10).pack(side=tk.LEFT)
+        print(self.points.get())
+        self.heading = tk.Label(self.scale, text="Enter Scale Factor: ").pack(side=tk.LEFT)
+        self.entry = tk.Entry(self.scale, textvariable=self.scaleFactor, width=10).pack(side=tk.LEFT)
+        self.button = tk.Button(self.scale, text="Scale", width=16, command=self.activate)
+        self.button.pack(side=tk.RIGHT, padx=2, pady=2)
+        self.scale.pack(side=tk.TOP, fill=tk.X)
+
+    def activate(self):
+        #self.translatePoints = list(self.points.get())
+        self.translatePoints = str.split(self.points.get())
+
+        if self.master.flg>0:
+            self.master.ob_world.scaling(self.translatePoints, self.scaleFactor.get(), self.master.ob_canvas_frame.canvas)
+            self.master.flg = 1
+
 class cl_translate_bar:
     def __init__(self, master):
+        self.points = tk.StringVar()
+        self.points.set('')
         self.master = master
-        frame = tk.Frame(master.ob_root_window)
-        frame.pack()
-        translation = []
-        heading = tk.Label(master.ob_root_window, text="Translate: Enter dX, dY, dZ").pack(side=tk.TOP)
-        entry = tk.Entry(master.ob_root_window, textvariable=translation, width=25).pack(side=tk.RIGHT)
+        self.translation = tk.Frame(master.ob_root_window)
+        self.heading = tk.Label(self.translation, text="Translation ---> Enter Tx, Ty, Tz separated with space: ").pack(side=tk.LEFT)
+        self.entry = tk.Entry(self.translation, textvariable=self.points, width=25).pack(side=tk.LEFT)
+        print(self.points.get())
+        self.translatePoints = list(self.points.get())
+        self.button = tk.Button(self.translation, text="Translate", width=16, command=self.activate)
+        self.button.pack(side=tk.RIGHT, padx=2, pady=2)
+        self.translation.pack(side=tk.TOP, fill=tk.X)
+
+    def activate(self):
+        #self.translatePoints = list(self.points.get())
+        self.translatePoints = str.split(self.points.get())
+
+        if self.master.flg>0:
+            #self.master.ob_canvas_frame.canvas.delete("all")
+            self.master.ob_world.translation(self.translatePoints, self.master.ob_canvas_frame.canvas)
+            self.master.flg = 1
+
+
 
 
 
@@ -309,7 +380,7 @@ class cl_toolbar:
         self.master.statusBar_frame.set('%s',"called the toolbar callback!")
 
     def browse_file(self):
-        lines =[]
+        lines = []
         self.var_filename.set(tk.filedialog.askopenfilename(filetypes=[("allfiles", "*"), ("pythonfiles", "*.txt")]))
         filename = self.var_filename.get()
         with open(filename) as textFile:

@@ -3,6 +3,8 @@
 # 2017-09-18
 # Assignment_01_03
 
+import numpy as np
+from time import sleep
 
 class cl_world:
     def __init__(self, objects=[], canvases=[]):
@@ -32,11 +34,59 @@ class cl_world:
         self.create_vertex_list()
         self.get_viewport()
         self.get_window()
+        self.draw(canvas)
+
+    def translation(self, tPoints, canvas):
+        Dx = float(tPoints[0])
+        Dy = float(tPoints[1])
+        Dz = float(tPoints[2])
+
+        dx = Dx/100
+        dy = Dy/100
+        dz = Dz/100
+
+        for i in range(0, 100):
+            self.drawTranslation(dx, dy, dz)
+            self.draw(canvas)
+
+    def drawTranslation(self, x, y, z):
+        points = np.array(self.vertex_list, dtype=float)
+        tPoints = np.array([x, y, z], dtype=float)
+        translatedPoints = points + tPoints
+        self.vertex_list = translatedPoints.tolist()
+
+
+    def scaling(self, point, factor, canvas):
+        factor = float(factor)
+        x = float(point[0])
+        y = float(point[1])
+        z = float(point[2])
+
+        self.drawTranslation(-x, -y, -z)
+
+        #for i in range(0, 100):
+        self.drawScaling(factor, canvas)
+
+        self.drawTranslation(x, y, z)
+
+        self.draw(canvas)
+
+
+    def drawScaling(self, factor, canvas):
+        Scalepoints = np.array(self.vertex_list, dtype=float)
+        sFactor = np.array([factor, factor, factor])
+        translatedPoints = Scalepoints * sFactor
+        self.vertex_list = translatedPoints.tolist()
+        #self.draw(canvas)
+
+
+
+    def draw(self, canvas):
         self.translate_points()
         self.create_draw_list()
-
         a = self.view_dimension
         dimension = self.translateViewport(a[0], a[1], a[2], a[3])
+        canvas.delete("all")
         self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black'))
         for elements in self.draw_list:
             self.objects.append(canvas.create_polygon(elements, outline='black', fill='red'))
@@ -45,7 +95,7 @@ class cl_world:
         self.vertex_list = []
         for element in self.data:
             if element[0] == 'v':
-                self.vertex_list.append(element)
+                self.vertex_list.append([element[1], element[2], element[3]])
 
     def create_edge_list(self):
         self.edge_list = []
@@ -83,7 +133,7 @@ class cl_world:
     def translate_points(self):
         self.translated_points = []
         for element in self.vertex_list:
-            temp = self.translate_coordinate(element[1], element[2])
+            temp = self.translate_coordinate(element[0], element[1])
             self.translated_points.append(temp)
 
     def translate_coordinate(self, pwx, pwy):
