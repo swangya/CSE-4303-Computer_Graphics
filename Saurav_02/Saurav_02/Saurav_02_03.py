@@ -48,9 +48,7 @@ class cl_world:
 
         for i in range(0, 100):
             self.drawTranslation(dx, dy, dz)
-            canvas.delete("all")
             self.draw(canvas)
-
 
     def drawTranslation(self, x, y, z):
         points = np.array(self.vertex_list, dtype=float)
@@ -67,13 +65,11 @@ class cl_world:
 
         self.drawTranslation(-x, -y, -z)
 
-        temp = factor**(1/100)
-
-        for i in range(0, 100):
-            self.drawScaling(temp, canvas)
+        #for i in range(0, 100):
+        self.drawScaling(factor, canvas)
 
         self.drawTranslation(x, y, z)
-        canvas.delete("all")
+
         self.draw(canvas)
 
 
@@ -111,7 +107,6 @@ class cl_world:
                 rotated.append(sum([r[j][i] * element[j] for j in range(3)]))
             rotatedList.append(rotated)
         self.vertex_list = rotatedList
-        canvas.delete("all")
         self.draw(canvas)
 
     def get_rotationMatrix(self, u, theta):
@@ -155,7 +150,7 @@ class cl_world:
         self.create_draw_list()
         a = self.view_dimension
         dimension = self.translateViewport(a[0], a[1], a[2], a[3])
-
+        canvas.delete("all")
         self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black'))
         for elements in self.draw_list:
             self.objects.append(canvas.create_polygon(elements, outline='black', fill='red'))
