@@ -177,9 +177,11 @@ class c1_rotate_bar:
             A.append(float(self.pointA[i]))
             B.append((self.pointB[i]))
 
+        angle = self.degree.get()
+        angle = float(angle)
 
         if self.master.flg>0:
-            self.master.ob_world.Rotate(A, B, self.degree.get(), self.master.ob_canvas_frame.canvas)
+            self.master.ob_world.Rotate(A, B, line, angle,  self.master.ob_canvas_frame.canvas)
             self.master.flg = 1
 
 
