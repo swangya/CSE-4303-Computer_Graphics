@@ -15,6 +15,9 @@ class cl_widgets:
     def __init__(self, ob_root_window, ob_world=[]):
         self.ob_root_window = ob_root_window
         self.ob_world = ob_world
+
+        ob_world.set_camera()
+
         self.menu = cl_menu(self)
         self.toolbar = cl_toolbar(self)
 

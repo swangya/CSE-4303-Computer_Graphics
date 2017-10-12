@@ -19,7 +19,62 @@ class cl_world:
         self.width = 0
         self.height = 0
         self.viewFrameDimensions = []
+
+        self.cameraName = ''
+        self.cameraType = "parallel"
+        self.VRP = [0, 0, 0]
+        self.VPN = [0, 0, 1]
+        self.VUP = [0, 1, 0]
+        self.PRP = [0, 0, 1]
+        self.VRC = [-1, 1, -1, 1, -1, 1]
+        self.viewPort = [0.1, 0.1, 0.4, 0.4]
         # self.display
+
+    def set_camera(self):
+        filename = "cameras.txt"
+        with open(filename) as textFile:
+            lines = [line.split() for line in textFile]
+        list = [x for x in lines if x != []]
+        lines = list
+
+        flg = 0
+
+        for element in lines:
+            if element[0] == 'c':
+                flg = flg + 1;
+
+            if flg == 1:
+                if element[0] == 'i':
+                    self.cameraName = element[1]
+                elif element[0] == 't':
+                    self.cameraType = element[1]
+                elif element[0] == 'r':
+                    self.VRP = self.get_listData(element)
+                elif element[0] == 'n':
+                    self.VPN = self.get_listData(element)
+                elif element[0] == 'u':
+                    self.VUP = self.get_listData(element)
+                elif element[0] == 'p':
+                    self.PRP = self.get_listData(element)
+                elif element[0] == 'w':
+                    self.VRC = self.get_listData(element)
+                elif element[0] == 's':
+                    self.viewPort = self.get_listData(element)
+
+        print(self.cameraName, self.cameraType, self.VRP, self.VPN, self.VUP, self.PRP)
+
+
+    def get_listData(self, list):
+        retList = []
+        length = int(len(list))
+
+        for i in range(1, length):
+            retList.append(float(list[i]))
+
+        return retList
+
+
+
 
     def add_canvas(self, canvas):
         self.canvases.append(canvas)
