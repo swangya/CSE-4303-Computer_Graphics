@@ -85,8 +85,28 @@ class cl_world:
         return retList
 
     def get_projMat(self):
-        tranVRP_ORJ = []
+        tranVRP_ORJ = np.array([[1.0, 0.0, 0.0, -self.VRP[0]], [0.0, 1.0, 0.0, -self.VRP[1]], [0.0, 0.0, 1.0, -self.VRP[2]], [0.0, 0.0, 0.0, 1.0]])
 
+        hyp = np.sqrt(self.VPN[1]**2 + self.VPN[2]**2)
+        if hyp == 0:
+            hyp = 1
+        a = float(self.VPN[2]/hyp)
+        b = float(self.VPN[1]/hyp)
+        rotateVPNx = np.array([[1.0, 0.0, 0.0, 0.0], [0.0, a, -b, 0.0], [0.0, -b, a, 0.0], [0.0, 0.0, 0.0, 1.0]])
+
+        VPNprime = self.VPN
+        VPNprime.append(1)
+        VPNprime = np.array(VPNprime)
+        VPNprime = rotateVPNx.dot(VPNprime)
+
+        hyp = np.sqrt(VPNprime[0] ** 2 + VPNprime[2] ** 2)
+        if hyp == 0:
+            hyp = 1
+        a = float(VPNprime[2] / hyp)
+        b = float(VPNprime[0] / hyp)
+        rotateVPNy = np.array([[a, 0.0, b, 0.0], [0.0, 1.0, 0.0, 0.0], [-b, 0.0, a, 0.0], [0.0, 0.0, 0.0, 1.0]])
+
+        VPNprime = rotateVPNy.dot(VPNprime)
 
 
 
