@@ -149,7 +149,7 @@ class cl_world:
         a = self.view_dimension
         dimension = self.translateViewport(a[0], a[1], a[2], a[3])
 
-        self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black'))
+        self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black', fill='white'))
         for elements in self.draw_list:
             self.objects.append(canvas.create_polygon(elements, outline='black', fill='red'))
 

@@ -16,7 +16,7 @@ class cl_widgets:
         self.ob_root_window = ob_root_window
         self.ob_world = ob_world
 
-        ob_world.set_camera()
+        #ob_world.set_camera()
 
         self.menu = cl_menu(self)
         self.toolbar = cl_toolbar(self)
@@ -33,6 +33,8 @@ class cl_widgets:
         self.statusBar_frame.set('%s', 'This is the status bar')
         self.ob_canvas_frame = cl_canvas_frame(self)
         self.ob_world.add_canvas(self.ob_canvas_frame.canvas)
+
+        ob_world.set_camera(self.ob_canvas_frame.canvas)
         self.lines = []
         self.flg = 0
 

@@ -28,9 +28,10 @@ class cl_world:
         self.PRP = [0, 0, 1]
         self.VRC = [-1, 1, -1, 1, -1, 1]
         self.viewPort = [0.1, 0.1, 0.4, 0.4]
+        self.projMat = []
         # self.display
 
-    def set_camera(self):
+    def set_camera(self, canvas):
         filename = "cameras.txt"
         with open(filename) as textFile:
             lines = [line.split() for line in textFile]
@@ -58,10 +59,20 @@ class cl_world:
                     self.PRP = self.get_listData(element)
                 elif element[0] == 'w':
                     self.VRC = self.get_listData(element)
+                    self.window_dimension = self.VRC
                 elif element[0] == 's':
-                    self.viewPort = self.get_listData(element)
+                    self.view_dimension = self.get_listData(element)
 
-        print(self.cameraName, self.cameraType, self.VRP, self.VPN, self.VUP, self.PRP)
+        self.width = canvas.cget("width")
+        self.height = canvas.cget("height")
+
+        a = self.view_dimension
+        dimension = self.translateViewport(a[0], a[1], a[2], a[3])
+
+        self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black', fill='white'))
+
+        self.get_projMat()
+
 
 
     def get_listData(self, list):
@@ -72,6 +83,9 @@ class cl_world:
             retList.append(float(list[i]))
 
         return retList
+
+    def get_projMat(self):
+        tranVRP_ORJ = []
 
 
 
@@ -84,8 +98,6 @@ class cl_world:
         self.data = data
         self.width = canvas.cget("width")
         self.height = canvas.cget("height")
-        self.create_edge_list()
-        self.create_vertex_list()
         self.get_viewport()
         self.get_window()
         self.draw(canvas)
@@ -225,14 +237,14 @@ class cl_world:
             if element[0] == 's':
                 dimension = element
                 break
-        self.view_dimension = [dimension[1], dimension[2], dimension[3], dimension[4]]
+        #self.view_dimension = [dimension[1], dimension[2], dimension[3], dimension[4]]
 
     def get_window(self):
         for element in self.data:
             if element[0] == 'w':
                 dimension = element
                 break
-        self.window_dimension = [dimension[1], dimension[2], dimension[3], dimension[4]]
+        #self.window_dimension = [dimension[1], dimension[2], dimension[3], dimension[4]]
 
     def translateViewport(self, xmin, ymin, xmax, ymax):
         a = self.width
