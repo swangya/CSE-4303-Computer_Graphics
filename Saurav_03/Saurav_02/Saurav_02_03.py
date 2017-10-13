@@ -1,9 +1,11 @@
 # Saurav, Swangya
 # 1001-054-908
-# 2017-09-29
+# 2017-09-28
 # Assignment_02_03
 
 import numpy as np
+from math import pi ,sin, cos
+from time import sleep
 
 class cl_world:
     def __init__(self, objects=[], canvases=[]):
@@ -40,10 +42,13 @@ class cl_world:
         Dy = float(tPoints[1])
         Dz = float(tPoints[2])
 
-        self.drawTranslation(Dx, Dy, Dz)
-        canvas.delete("all")
-        self.draw(canvas)
+        dx = Dx/100
+        dy = Dy/100
+        dz = Dz/100
 
+        for i in range(0, 100):
+            self.drawTranslation(dx, dy, dz)
+            self.draw(canvas)
 
     def drawTranslation(self, x, y, z):
         points = np.array(self.vertex_list, dtype=float)
@@ -59,9 +64,12 @@ class cl_world:
         z = float(point[2])
 
         self.drawTranslation(-x, -y, -z)
+
+        #for i in range(0, 100):
         self.drawScaling(factor, canvas)
+
         self.drawTranslation(x, y, z)
-        canvas.delete("all")
+
         self.draw(canvas)
 
 
@@ -72,85 +80,78 @@ class cl_world:
         self.vertex_list = translatedPoints.tolist()
         #self.draw(canvas)
 
-    def Rotate(self, A, B, line, angle, canvas):
-        tempList = []
-        rotatedPoints = []
 
-        Mat = self.rotationMat(A, B, angle)
+    def Rotate(self, point1, point2, theta, canvas):
+        rotatedList = []
+
+        theta = float(theta)
 
         for element in self.vertex_list:
-            element = [float(i) for i in element]
-            element.append(1.0)
-            tempList.append(element)
+            element[0] = float(element[0])
+            element[1] = float(element[1])
+            element[2] = float(element[2])
+            u = []
+            squaredSum = 0
+            for i, f in zip(point1, point2):
+                i = float(i)
+                f = float(f)
+                u.append(f - i)
+                squaredSum += (f - i) ** 2
 
-        for element in tempList:
-            element = np.array(element)
-            element = element.dot(Mat)
-            temp = element
-            temp = temp.tolist()
-            del temp[-1]
-            rotatedPoints.append(temp)
+            u = [i / squaredSum for i in u]
 
-        self.vertex_list = rotatedPoints
-        canvas.delete("all")
+            r = self.get_rotationMatrix(u, theta)
+            rotated = []
+
+            for i in range(3):
+                rotated.append(sum([r[j][i] * element[j] for j in range(3)]))
+            rotatedList.append(rotated)
+        self.vertex_list = rotatedList
         self.draw(canvas)
 
+    def get_rotationMatrix(self, u, theta):
+        # Rotation Matrix sourced from Wikipedia:  https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
+        x = [cos(theta) + u[0] ** 2 * (1 - cos(theta)),
+                 u[0] * u[1] * (1 - cos(theta)) - u[2] * sin(theta),
+                 u[0] * u[2] * (1 - cos(theta)) + u[1] * sin(theta)]
 
-    def rotationMat(self,N, M, angle):
-        A = float(M[0]) - float(N[0])
-        B = float(M[1]) - float(N[1])
-        C = float(M[2]) - float(N[2])
+        y = [u[0] * u[1] * (1 - cos(theta)) + u[2] * sin(theta),
+                 cos(theta) + u[1] ** 2 * (1 - cos(theta)),
+                 u[1] * u[2] * (1 - cos(theta)) - u[0] * sin(theta)]
 
-        L = np.sqrt(A**2 + B**2 + C**2)
+        z = [u[0] * u[2] * (1 - cos(theta)) - u[1] * sin(theta),
+                 u[1] * u[2] * (1 - cos(theta)) + u[0] * sin(theta),
+                 cos(theta) + u[2] ** 2 * (1 - cos(theta))]
 
-        V = np.sqrt(B**2 + C**2)
-        if V == 0:
-            V = 1
+        matrix = [x, y, z]
+        return matrix
 
-        D = np.array([[1.0, 0.0, 0.0, -N[0]], [0.0, 1.0, 0.0, -N[1]], [0.0, 0.0, 1.0, -N[2]], [0.0, 0.0, 0.0, 1.0]])
+    def R(self, u, theta):
+        #Rotation Matrix sourced from Wikipedia:  https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
 
-        Rx = np.array([[1.0, 0.0, 0.0, 0.0], [0.0, (C/V), (-B/V), 0.0], [0.0, (B/V), (C/V), 0.0], [0.0, 0.0, 0.0, 1.0]])
+        a = [[cos(theta) + u[0] ** 2 * (1 - cos(theta)),
+                 u[0] * u[1] * (1 - cos(theta)) - u[2] * sin(theta),
+                 u[0] * u[2] * (1 - cos(theta)) + u[1] * sin(theta)],
+                [u[0] * u[1] * (1 - cos(theta)) + u[2] * sin(theta),
+                 cos(theta) + u[1] ** 2 * (1 - cos(theta)),
+                 u[1] * u[2] * (1 - cos(theta)) - u[0] * sin(theta)],
+                [u[0] * u[2] * (1 - cos(theta)) - u[1] * sin(theta),
+                 u[1] * u[2] * (1 - cos(theta)) + u[0] * sin(theta),
+                 cos(theta) + u[2] ** 2 * (1 - cos(theta))]]
+        return a
 
-        Ry = np.array([[(V/L), 0.0, (-A/L), 0.0], [0.0, 1.0, 0.0, 0.0], [(A/L), 0.0, (V/L), 0.0], [0.0, 0.0, 0.0, 1.0]])
 
-        angle = angle * np.pi/180
-        s = np.sin(angle)
-        c = np.cos(angle)
+    #def rotate(self, angle, line, canvas):
 
-        Rz = np.array([[c, -s, 0.0, 0.0], [s, c, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
 
-        revRy = np.array([[(V/L), 0.0, (A/L), 0.0], [0.0, 1.0, 0.0, 0.0], [(-A/L), 0.0, (V/L), 0.0], [0.0, 0.0, 0.0, 1.0]])
-
-        revRx = np.array([[1.0, 0.0, 0.0, 0.0], [0.0, (C/V), (B/V), 0.0], [0.0, (-B/V), (C/V), 0.0], [0.0, 0.0, 0.0, 1.0]])
-
-        revD = np.array([[1.0, 0.0, 0.0, N[0]], [0.0, 1.0, 0.0, N[1]], [0.0, 0.0, 1.0, N[2]], [0.0, 0.0, 0.0, 1.0]])
-
-        Mat = revD.dot(revRx)
-        Mat = Mat.dot(revRy)
-        Mat = Mat.dot(Rz)
-        Mat = Mat.dot(Ry)
-        Mat = Mat.dot(Rx)
-        Mat = Mat.dot(D)
-
-        if B == 0 and C == 0:
-            Mat = np.array([[1.0, 0.0, 0.0, 0.0], [0.0, c, -s, 0.0], [0.0, s, c, 0.0], [0.0, 0.0, 0.0, 1.0]])
-
-        elif A == 0 and C == 0:
-            Mat = np.array([[c, 0.0, s, 0.0], [0.0, 1.0, 0.0, 0.0], [-s, 0.0, c, 0.0], [0.0, 0.0, 0.0, 1.0]])
-
-        elif A == 0 and B == 0:
-            Mat = np.array([[c, -s, 0.0, 0.0], [s, c, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
-
-        return Mat
 
     def draw(self, canvas):
         self.translate_points()
         self.create_draw_list()
-        print(self.window_dimension)
         a = self.view_dimension
         dimension = self.translateViewport(a[0], a[1], a[2], a[3])
-
-        self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black', fill='white'))
+        canvas.delete("all")
+        self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black'))
         for elements in self.draw_list:
             self.objects.append(canvas.create_polygon(elements, outline='black', fill='red'))
 

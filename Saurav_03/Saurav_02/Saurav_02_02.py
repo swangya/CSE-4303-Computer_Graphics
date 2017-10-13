@@ -1,6 +1,6 @@
 # Saurav, Swangya
 # 1001-054-908
-# 2017-09-29
+# 2017-09-28
 # Assignment_02_02
 
 
@@ -8,7 +8,6 @@ import tkinter as tk
 from tkinter import simpledialog
 from tkinter import filedialog
 from tkinter import messagebox
-import time
 
 
 class cl_widgets:
@@ -22,15 +21,14 @@ class cl_widgets:
         self.scale_bar = cl_scale_bar(self)
         self.translate_bar = cl_translate_bar(self)
 
-        #self.buttons_panel_01 = cl_buttons_panel_01(self)
-        #self.buttons_panel_02 = cl_buttons_panel_02(self)
+        self.buttons_panel_01 = cl_buttons_panel_01(self)
+        self.buttons_panel_02 = cl_buttons_panel_02(self)
         # Added status bar. Kamangar 2017_08_26
         self.statusBar_frame = cl_statusBar_frame(self.ob_root_window)
         self.statusBar_frame.pack(side=tk.BOTTOM, fill=tk.X)
         self.statusBar_frame.set('%s', 'This is the status bar')
         self.ob_canvas_frame = cl_canvas_frame(self)
         self.ob_world.add_canvas(self.ob_canvas_frame.canvas)
-        ob_world.set_camera(self.ob_canvas_frame.canvas)
         self.lines = []
         self.flg = 0
 
@@ -164,11 +162,10 @@ class c1_rotate_bar:
         self.button.pack(side=tk.RIGHT, padx=2, pady=2)
         self.rotate.pack(side=tk.TOP, fill=tk.X)
 
-    def activate(self):
-        angle = self.degree.get()
-        angle = float(angle)
 
-        theta = angle/100
+
+
+    def activate(self):
 
         self.pointA = str.split(self.point1.get())
         self.pointB = str.split(self.point2.get())
@@ -180,8 +177,9 @@ class c1_rotate_bar:
             A.append(float(self.pointA[i]))
             B.append((self.pointB[i]))
 
+
         if self.master.flg>0:
-            self.master.ob_world.Rotate(A, B, line, angle,  self.master.ob_canvas_frame.canvas)
+            self.master.ob_world.Rotate(A, B, self.degree.get(), self.master.ob_canvas_frame.canvas)
             self.master.flg = 1
 
 
@@ -215,30 +213,24 @@ class cl_scale_bar:
 class cl_translate_bar:
     def __init__(self, master):
         self.points = tk.StringVar()
-        self.points.set('0.1 0.1 0.1')
+        self.points.set('')
         self.master = master
         self.translation = tk.Frame(master.ob_root_window)
         self.heading = tk.Label(self.translation, text="Translation ---> Enter Tx, Ty, Tz separated with space: ").pack(side=tk.LEFT)
-        self.entry = tk.Entry(self.translation, textvariable=self.points, width=10).pack(side=tk.LEFT)
+        self.entry = tk.Entry(self.translation, textvariable=self.points, width=25).pack(side=tk.LEFT)
+        print(self.points.get())
         self.translatePoints = list(self.points.get())
         self.button = tk.Button(self.translation, text="Translate", width=16, command=self.activate)
         self.button.pack(side=tk.RIGHT, padx=2, pady=2)
         self.translation.pack(side=tk.TOP, fill=tk.X)
 
     def activate(self):
+        #self.translatePoints = list(self.points.get())
         self.translatePoints = str.split(self.points.get())
 
         if self.master.flg>0:
-            Dx = float(self.translatePoints[0])
-            Dy = float(self.translatePoints[1])
-            Dz = float(self.translatePoints[2])
-
-            dx = Dx/100
-            dy = Dy/100
-            dz = Dz/100
-
-            for i in range(0, 100):
-                self.master.ob_world.translation([dx, dy, dz], self.master.ob_canvas_frame.canvas)
+            #self.master.ob_canvas_frame.canvas.delete("all")
+            self.master.ob_world.translation(self.translatePoints, self.master.ob_canvas_frame.canvas)
             self.master.flg = 1
 
 
@@ -389,9 +381,9 @@ class cl_toolbar:
         self.lines = []
         self.master = master
         self.toolbar = tk.Frame(master.ob_root_window)
-        self.button = tk.Button(self.toolbar, text="Load", width=16, command=self.browse_file)
-        self.button.pack(side=tk.LEFT, padx=2, pady=2)
         self.button = tk.Button(self.toolbar, text="Draw", width=16, command=self.toolbar_draw_callback)
+        self.button.pack(side=tk.LEFT, padx=2, pady=2)
+        self.button = tk.Button(self.toolbar, text="Load", width=16, command=self.browse_file)
         self.button.pack(side=tk.RIGHT, padx=2, pady=2)
         self.toolbar.pack(side=tk.TOP, fill=tk.X)
 

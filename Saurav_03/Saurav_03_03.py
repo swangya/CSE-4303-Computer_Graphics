@@ -59,7 +59,7 @@ class cl_world:
                     self.PRP = self.get_listData(element)
                 elif element[0] == 'w':
                     self.VRC = self.get_listData(element)
-                    self.window_dimension = self.VRC
+                    self.window_dimension = [self.VRC[0], self.VRC[2], self.VRC[1], self.VRC[3]]
                 elif element[0] == 's':
                     self.view_dimension = self.get_listData(element)
 
@@ -164,6 +164,17 @@ class cl_world:
 
         return retmat
 
+    def get_projectedpoints(self):
+        temp = []
+        for element in self.vertex_list:
+            element.append(1)
+            element = np.array(element, dtype=float)
+            pPoint = self.projMat.dot(element)
+            pPoint = pPoint.tolist()
+            pPoint = pPoint[:-1]
+            temp.append(pPoint)
+        self.vertex_list = temp
+
     def add_canvas(self, canvas):
         self.canvases.append(canvas)
         canvas.world = self
@@ -172,6 +183,8 @@ class cl_world:
         self.data = data
         self.width = canvas.cget("width")
         self.height = canvas.cget("height")
+        self.create_edge_list()
+        self.create_vertex_list()
         #self.get_viewport()
         #self.get_window()
         self.draw(canvas)
@@ -285,10 +298,12 @@ class cl_world:
         return Mat
 
     def draw(self, canvas):
+        canvas.delete("all")
+        self.get_projectedpoints()
         self.translate_points()
         self.create_draw_list()
-        canvas.delete("all")
         a = self.view_dimension
+        print(self.window_dimension)
         dimension = self.translateViewport(a[0], a[1], a[2], a[3])
 
         self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black'))
@@ -307,19 +322,21 @@ class cl_world:
             if element[0] == 'f':
                 self.edge_list.append(element)
 
+    '''
     def get_viewport(self):
         for element in self.data:
             if element[0] == 's':
                 dimension = element
                 break
-        #self.view_dimension = [dimension[1], dimension[2], dimension[3], dimension[4]]
+        self.view_dimension = [dimension[1], dimension[2], dimension[3], dimension[4]]
 
     def get_window(self):
         for element in self.data:
             if element[0] == 'w':
                 dimension = element
                 break
-        #self.window_dimension = [dimension[1], dimension[2], dimension[3], dimension[4]]
+        self.window_dimension = [dimension[1], dimension[2], dimension[3], dimension[4]]
+    '''
 
     def translateViewport(self, xmin, ymin, xmax, ymax):
         a = self.width
@@ -388,8 +405,8 @@ class cl_world:
 
             canvas.delete("all")
 
-            self.get_viewport()
-            self.get_window()
+            #self.get_viewport()
+           # self.get_window()
             self.translate_points()
             self.create_draw_list()
 
