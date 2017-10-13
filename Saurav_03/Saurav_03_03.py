@@ -69,9 +69,9 @@ class cl_world:
         a = self.view_dimension
         dimension = self.translateViewport(a[0], a[1], a[2], a[3])
 
-        self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black', fill='white'))
+        self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black'))
 
-        self.get_projMat()
+        self.projMat = self.get_projMat()
 
 
 
@@ -99,6 +99,11 @@ class cl_world:
         VPNprime = np.array(VPNprime)
         VPNprime = rotateVPNx.dot(VPNprime)
 
+        VUPprime = self.VUP
+        VUPprime.append(1)
+        VUPprime = np.array(VUPprime)
+        VUPprime = rotateVPNx.dot(VUPprime)
+
         hyp = np.sqrt(VPNprime[0] ** 2 + VPNprime[2] ** 2)
         if hyp == 0:
             hyp = 1
@@ -107,8 +112,57 @@ class cl_world:
         rotateVPNy = np.array([[a, 0.0, b, 0.0], [0.0, 1.0, 0.0, 0.0], [-b, 0.0, a, 0.0], [0.0, 0.0, 0.0, 1.0]])
 
         VPNprime = rotateVPNy.dot(VPNprime)
+        VUPprime = rotateVPNy.dot(VUPprime)
 
+        hyp = np.sqrt(VUPprime[0] ** 2 + VUPprime[1] ** 2)
+        if hyp == 0:
+            hyp = 1
+        a = float(VUPprime[1] / hyp)
+        b = float(VUPprime[0] / hyp)
 
+        rotateVUPz = np.array([[a, -b, 0.0, 0.0], [b, a, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+
+        uvn = self.VRC
+        temp1 = (-(self.PRP[0]-((uvn[1] + uvn[0])/2)))/self.PRP[2]
+        temp2 = (-(self.PRP[1]-((uvn[3] + uvn[2])/2)))/self.PRP[2]
+        shear = np.array([[1, 0, temp1, 0], [0, 1, temp2, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
+
+        if uvn[1]>uvn[0]:
+            a = -uvn[0]
+        else:
+            a = -uvn[1]
+        if uvn[3]>uvn[2]:
+            b = -uvn[2]
+        else:
+            b = -uvn[3]
+        if uvn[5]>uvn[4]:
+            c = -uvn[4]
+        else:
+            c = -uvn[5]
+        translate = np.array([[1, 0, 0, a], [0, 1, 0, b], [0, 0, 1, c], [0, 0, 0, 1]])
+
+        if uvn[1]>uvn[0]:
+            a = 1/(uvn[1] - uvn[0])
+        else:
+            a = 1/(uvn[0] - uvn[1])
+        if uvn[3]>uvn[2]:
+            b = 1/(uvn[3] - uvn[2])
+        else:
+            b = 1/(uvn[2] - uvn[3])
+        if uvn[5]>uvn[4]:
+            c = 1/(uvn[5] - uvn[4])
+        else:
+            c = 1/(uvn[4] - uvn[5])
+        scale = np.array([[a, 0, 0, 0], [0, b, 0, 0], [0, 0, c, 0], [0, 0, 0, 1]])
+
+        retmat = rotateVPNx.dot(tranVRP_ORJ)
+        retmat = rotateVPNy.dot(retmat)
+        retmat = rotateVUPz.dot(retmat)
+        retmat = shear.dot(retmat)
+        retmat = translate.dot(retmat)
+        retmat = scale.dot(retmat)
+
+        return retmat
 
     def add_canvas(self, canvas):
         self.canvases.append(canvas)
@@ -118,8 +172,8 @@ class cl_world:
         self.data = data
         self.width = canvas.cget("width")
         self.height = canvas.cget("height")
-        self.get_viewport()
-        self.get_window()
+        #self.get_viewport()
+        #self.get_window()
         self.draw(canvas)
 
     def translation(self, tPoints, canvas):
@@ -233,6 +287,7 @@ class cl_world:
     def draw(self, canvas):
         self.translate_points()
         self.create_draw_list()
+        canvas.delete("all")
         a = self.view_dimension
         dimension = self.translateViewport(a[0], a[1], a[2], a[3])
 
