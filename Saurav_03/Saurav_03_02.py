@@ -1,7 +1,7 @@
 # Saurav, Swangya
 # 1001-054-908
-# 2017-09-29
-# Assignment_02_02
+# 2017-10-12
+# Assignment_03_02
 
 
 import tkinter as tk
@@ -22,6 +22,8 @@ class cl_widgets:
         self.scale_bar = cl_scale_bar(self)
         self.translate_bar = cl_translate_bar(self)
 
+        self.fly_bar = c1_fly_bar(self)
+
         #self.buttons_panel_01 = cl_buttons_panel_01(self)
         #self.buttons_panel_02 = cl_buttons_panel_02(self)
         # Added status bar. Kamangar 2017_08_26
@@ -30,7 +32,7 @@ class cl_widgets:
         self.statusBar_frame.set('%s', 'This is the status bar')
         self.ob_canvas_frame = cl_canvas_frame(self)
         self.ob_world.add_canvas(self.ob_canvas_frame.canvas)
-        ob_world.set_camera(self.ob_canvas_frame.canvas)
+        ob_world.set_camera(self.ob_canvas_frame.canvas, "X")
         self.lines = []
         self.flg = 0
 
@@ -227,6 +229,7 @@ class cl_translate_bar:
 
     def activate(self):
         self.translatePoints = str.split(self.points.get())
+        self.master.ob_world.draw()
 
         if self.master.flg>0:
             Dx = float(self.translatePoints[0])
@@ -241,6 +244,24 @@ class cl_translate_bar:
                 self.master.ob_world.translation([dx, dy, dz], self.master.ob_canvas_frame.canvas)
             self.master.flg = 1
 
+
+class c1_fly_bar:
+    def __init__(self, master):
+        self.points = tk.StringVar()
+        self.points.set('0.1 0.1 0.1')
+        self.master = master
+        self.translation = tk.Frame(master.ob_root_window)
+        self.heading = tk.Label(self.translation, text="Fly ---> Enter Fly coordinates separated with space: ").pack(side=tk.LEFT)
+        self.entry = tk.Entry(self.translation, textvariable=self.points, width=10).pack(side=tk.LEFT)
+        self.translatePoints = list(self.points.get())
+        self.button = tk.Button(self.translation, text="Fly", width=16, command=self.activate)
+        self.button.pack(side=tk.RIGHT, padx=2, pady=2)
+        self.translation.pack(side=tk.TOP, fill=tk.X)
+
+    def activate(self):
+        self.translatePoints = str.split(self.points.get())
+        self.master.ob_world.set_camera(self.master.ob_canvas_frame.canvas, self.points.get())
+        self.master.ob_world.draw(self.master.ob_canvas_frame.canvas)
 
 
 
