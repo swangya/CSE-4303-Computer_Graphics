@@ -37,7 +37,8 @@ class cl_world:
         dimension = self.translateViewport(a[0], a[1], a[2], a[3])
         self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black'))
         for elements in self.draw_list:
-            self.objects.append(canvas.create_polygon(elements, outline='black', fill='red'))
+            self.objects.append(canvas.create_line(elements))
+
 
     def create_vertex_list(self):
         self.vertex_list = []
@@ -118,13 +119,19 @@ class cl_world:
         self.draw_list = []
         l = self.translated_points
         for elements in self.edge_list:
-            temp = []
-            for e in elements:
-                if e != 'f':
-                    x = int(e)-1
-                    temp = temp+l[x]
-            self.draw_list.append(temp)
-        print(self.draw_list)
+            elements.pop(0)
+            for i in range(0,3):
+                temp = []
+                x = int(elements[i])-1
+                if i==2:
+                    y = int(elements[0])-1
+                else:
+                    y = int(elements[i+1])-1
+                point1 = l[x]
+                point2 = l[y]
+                temp = [point1[0], point1[1], point2[0], point2[1]]
+                self.draw_list.append(temp)
+
 
     def redisplay(self, canvas, event):
         if self.objects:
