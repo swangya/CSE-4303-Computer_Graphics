@@ -45,13 +45,11 @@
       <file leaf-file-name="Saurav_04_03.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Saurav_04_03.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="460">
+            <state relative-caret-position="1169">
               <caret line="604" column="17" lean-forward="true" selection-start-line="604" selection-start-column="17" selection-end-line="604" selection-end-column="17" />
               <folding>
                 <element signature="e#16683#17084#0" expanded="false" />
                 <element signature="e#17327#17685#0" expanded="false" />
-                <element signature="e#17741#17945#0" expanded="false" />
-                <element signature="e#18005#18810#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -95,10 +93,11 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="1">
-    <option name="x" value="-7" />
-    <option name="width" value="974" />
-    <option name="height" value="1047" />
+  <component name="ProjectFrameBounds" extendedState="7">
+    <option name="x" value="-1928" />
+    <option name="y" value="-8" />
+    <option name="width" value="1936" />
+    <option name="height" value="1056" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -268,7 +267,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="0" width="974" height="1047" extended-state="1" />
+    <frame x="-1928" y="-8" width="1936" height="1056" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24835886" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -384,13 +383,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Saurav_04_03.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="460">
+        <state relative-caret-position="1169">
           <caret line="604" column="17" lean-forward="true" selection-start-line="604" selection-start-column="17" selection-end-line="604" selection-end-column="17" />
           <folding>
             <element signature="e#16683#17084#0" expanded="false" />
             <element signature="e#17327#17685#0" expanded="false" />
-            <element signature="e#17741#17945#0" expanded="false" />
-            <element signature="e#18005#18810#0" expanded="false" />
           </folding>
         </state>
       </provider>
