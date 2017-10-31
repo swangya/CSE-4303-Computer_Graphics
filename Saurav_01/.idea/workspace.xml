@@ -17,7 +17,7 @@
       <file leaf-file-name="Saurav_01_01.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Saurav_01_01.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
+            <state relative-caret-position="170">
               <caret line="12" column="22" lean-forward="false" selection-start-line="12" selection-start-column="22" selection-end-line="12" selection-end-column="22" />
               <folding>
                 <element signature="e#66#86#0" expanded="true" />
@@ -29,8 +29,8 @@
       <file leaf-file-name="Saurav_01_02.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Saurav_01_02.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1326">
-              <caret line="27" column="21" lean-forward="false" selection-start-line="27" selection-start-column="21" selection-end-line="27" selection-end-column="21" />
+            <state relative-caret-position="713">
+              <caret line="306" column="60" lean-forward="true" selection-start-line="306" selection-start-column="60" selection-end-line="306" selection-end-column="60" />
               <folding>
                 <element signature="e#6002#7413#0" expanded="false" />
                 <element signature="e#7447#8139#0" expanded="false" />
@@ -45,8 +45,8 @@
       <file leaf-file-name="Saurav_01_03.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Saurav_01_03.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="464">
-              <caret line="126" column="28" lean-forward="false" selection-start-line="126" selection-start-column="28" selection-end-line="126" selection-end-column="28" />
+            <state relative-caret-position="322">
+              <caret line="120" column="21" lean-forward="true" selection-start-line="120" selection-start-column="21" selection-end-line="120" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -69,7 +69,7 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="1">
     <option name="x" value="-7" />
     <option name="width" value="974" />
     <option name="height" value="1047" />
@@ -145,7 +145,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="0" width="974" height="1047" extended-state="0" />
+    <frame x="-7" y="0" width="974" height="1047" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23717949" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -182,6 +182,38 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/Saurav_01_01.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="12" column="22" lean-forward="false" selection-start-line="12" selection-start-column="22" selection-end-line="12" selection-end-column="22" />
+          <folding>
+            <element signature="e#66#86#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Saurav_01_02.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="27" column="21" lean-forward="false" selection-start-line="27" selection-start-column="21" selection-end-line="27" selection-end-column="21" />
+          <folding>
+            <element signature="e#6002#7413#0" expanded="false" />
+            <element signature="e#7447#8139#0" expanded="false" />
+            <element signature="e#8186#9223#0" expanded="false" />
+            <element signature="e#9266#9655#0" expanded="false" />
+            <element signature="e#9679#11116#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Saurav_01_03.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2142">
+          <caret line="126" column="28" lean-forward="false" selection-start-line="126" selection-start-column="28" selection-end-line="126" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Saurav_01_01.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -473,7 +505,7 @@
     <entry file="file://$PROJECT_DIR$/../../../../../../Neurekar_00/Neurekar_00_01.py" />
     <entry file="file://$PROJECT_DIR$/Saurav_01_01.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
+        <state relative-caret-position="170">
           <caret line="12" column="22" lean-forward="false" selection-start-line="12" selection-start-column="22" selection-end-line="12" selection-end-column="22" />
           <folding>
             <element signature="e#66#86#0" expanded="true" />
@@ -483,8 +515,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Saurav_01_02.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1326">
-          <caret line="27" column="21" lean-forward="false" selection-start-line="27" selection-start-column="21" selection-end-line="27" selection-end-column="21" />
+        <state relative-caret-position="713">
+          <caret line="306" column="60" lean-forward="true" selection-start-line="306" selection-start-column="60" selection-end-line="306" selection-end-column="60" />
           <folding>
             <element signature="e#6002#7413#0" expanded="false" />
             <element signature="e#7447#8139#0" expanded="false" />
@@ -497,8 +529,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Saurav_01_03.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="464">
-          <caret line="126" column="28" lean-forward="false" selection-start-line="126" selection-start-column="28" selection-end-line="126" selection-end-column="28" />
+        <state relative-caret-position="322">
+          <caret line="120" column="21" lean-forward="true" selection-start-line="120" selection-start-column="21" selection-end-line="120" selection-end-column="21" />
           <folding />
         </state>
       </provider>

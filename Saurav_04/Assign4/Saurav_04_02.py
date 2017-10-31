@@ -1,7 +1,7 @@
 # Saurav, Swangya
 # 1001-054-908
-# 2017-10-12
-# Assignment_03_02
+# 2017-10-26
+# Assignment_04_02
 
 
 import tkinter as tk
@@ -24,15 +24,34 @@ class cl_widgets:
 
         self.fly_bar = c1_fly_bar(self)
 
-        #self.buttons_panel_01 = cl_buttons_panel_01(self)
-        #self.buttons_panel_02 = cl_buttons_panel_02(self)
-        # Added status bar. Kamangar 2017_08_26
         self.statusBar_frame = cl_statusBar_frame(self.ob_root_window)
         self.statusBar_frame.pack(side=tk.BOTTOM, fill=tk.X)
         self.statusBar_frame.set('%s', 'This is the status bar')
+
+        filename = "cameras.txt"
+        with open(filename) as textFile:
+            lines = [line.split() for line in textFile]
+        list = [x for x in lines if x != []]
+        lines = list
+
+        self.cameras = []
+        temp = []
+
+        for elements in lines:
+            if elements[0] == 'c':
+                self.cameras.append(temp)
+                temp = []
+            temp.append(elements)
+        self.cameras.append(temp)
+
+        del(self.cameras[0])
+
         self.ob_canvas_frame = cl_canvas_frame(self)
+
         self.ob_world.add_canvas(self.ob_canvas_frame.canvas)
-        ob_world.set_camera(self.ob_canvas_frame.canvas, "X")
+        #ob_world.set_camera(self.cameras, self.ob_canvas_frame.canvas, "X")
+        ob_world.put_cameras(self.cameras, self.ob_canvas_frame.canvas)
+
         self.lines = []
         self.flg = 0
 
@@ -187,9 +206,6 @@ class c1_rotate_bar:
             self.master.flg = 1
 
 
-
-
-
 class cl_scale_bar:
     def __init__(self, master):
         self.points = tk.StringVar()
@@ -214,6 +230,7 @@ class cl_scale_bar:
             self.master.ob_world.scaling(self.translatePoints, self.scaleFactor.get(), self.master.ob_canvas_frame.canvas)
             self.master.flg = 1
 
+
 class cl_translate_bar:
     def __init__(self, master):
         self.points = tk.StringVar()
@@ -229,20 +246,14 @@ class cl_translate_bar:
 
     def activate(self):
         self.translatePoints = str.split(self.points.get())
-        self.master.ob_world.draw()
 
         if self.master.flg>0:
             Dx = float(self.translatePoints[0])
             Dy = float(self.translatePoints[1])
             Dz = float(self.translatePoints[2])
 
-            dx = Dx/100
-            dy = Dy/100
-            dz = Dz/100
+            self.master.ob_world.translation([Dx, Dy, Dz], self.master.ob_canvas_frame.canvas)
 
-            for i in range(0, 100):
-                self.master.ob_world.translation([dx, dy, dz], self.master.ob_canvas_frame.canvas)
-            self.master.flg = 1
 
 
 class c1_fly_bar:
@@ -259,11 +270,10 @@ class c1_fly_bar:
         self.translation.pack(side=tk.TOP, fill=tk.X)
 
     def activate(self):
+        flyPoints = str.split(self.points.get())
         self.translatePoints = str.split(self.points.get())
-        self.master.ob_world.set_camera(self.master.ob_canvas_frame.canvas, self.points.get())
-        self.master.ob_world.draw(self.master.ob_canvas_frame.canvas)
-
-
+        flyPoints = [float(i) for i in flyPoints]
+        self.master.ob_world.fly_camera(self.master.ob_canvas_frame.canvas, flyPoints)
 
 
 class cl_buttons_panel_01:
@@ -354,6 +364,7 @@ class MyDialog(tk.simpledialog.Dialog):
                 "Illegal values, please try again"
             )
 
+
 class cl_statusBar_frame(tk.Frame):
 
     def __init__(self, master):
@@ -368,8 +379,6 @@ class cl_statusBar_frame(tk.Frame):
     def clear(self):
         self.label.config(text="")
         self.label.update_idletasks()
-
-
 
 
 class cl_menu:
@@ -402,6 +411,7 @@ class cl_menu:
 
     def menu_item2_callback(self):
         self.master.statusBar_frame.set('%s',"called item2 callback!")
+
 
 class cl_toolbar:
     def __init__(self, master):

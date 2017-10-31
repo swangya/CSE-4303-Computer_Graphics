@@ -1,7 +1,7 @@
 # Saurav, Swangya
 # 1001-054-908
-# 2017-10-12
-# Assignment_03_03
+# 2017-10-26
+# Assignment_04_03
 
 import numpy as np
 
@@ -21,6 +21,11 @@ class cl_world:
         self.height = 0
         self.viewFrameDimensions = []
 
+        self.camData = []
+        self.camFrames = []
+        self.camNum = 0
+        self.progenitorCam = []
+
         self.cameraName = ''
         self.cameraType = "parallel"
         self.VRP = [0, 0, 0]
@@ -29,58 +34,88 @@ class cl_world:
         self.PRP = [0, 0, 1]
         self.VRC = [-1, 1, -1, 1, -1, 1]
         self.viewPort = [0.1, 0.1, 0.4, 0.4]
-        self.projMat = np.identity(4)
+        self.projMat = []
 
-        # self.display
-
-    def set_camera(self, canvas, fly):
-        filename = "cameras.txt"
-        with open(filename) as textFile:
-            lines = [line.split() for line in textFile]
-        list = [x for x in lines if x != []]
-        lines = list
-
-        flg = 0
-
-        for element in lines:
-            if element[0] == 'c':
-                flg = flg + 1;
-
-            if flg == 1:
-                if element[0] == 'i':
-                    self.cameraName = element[1]
-                elif element[0] == 't':
-                    self.cameraType = element[1]
-                elif element[0] == 'r':
-                    self.VRP = self.get_listData(element)
-                elif element[0] == 'n':
-                    self.VPN = self.get_listData(element)
-                elif element[0] == 'u':
-                    self.VUP = self.get_listData(element)
-                elif element[0] == 'p':
-                    self.PRP = self.get_listData(element)
-                elif element[0] == 'w':
-                    self.VRC = self.get_listData(element)
-                elif element[0] == 's':
-                    self.view_dimension = self.get_listData(element)
-
+    def put_cameras(self, data, canvas):
+        self.camData = data
+        self.camNum = len(data)
+        temp =[]
+        for element1 in data:
+            for element2 in element1:
+                if element2[0] == 's':
+                    temp = self.get_listData(element2)
+                    self.view_dimension.append(temp)
         self.width = canvas.cget("width")
         self.height = canvas.cget("height")
 
-        a = self.view_dimension
-        dimension = self.translateViewport(a[0], a[1], a[2], a[3])
+        for elements in self.view_dimension:
+            a = elements
+            dimension = self.translateViewport(a[0], a[1], a[2], a[3])
+            self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black', fill='white'))
 
-        self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black'))
+        for elem in data:
+            flg = 0
+            for element in elem:
+                if element[0] == 'c':
+                    flg = flg + 1;
 
-        self.projMat = self.get_pllProjMat(0)
+                if flg == 1:
+                    if element[0] == 'i':
+                        self.cameraName = element[1]
+                    elif element[0] == 't':
+                        self.cameraType = element[1]
+                    elif element[0] == 'r':
+                        self.VRP = self.get_listData(element)
+                    elif element[0] == 'n':
+                        self.VPN = self.get_listData(element)
+                    elif element[0] == 'u':
+                        self.VUP = self.get_listData(element)
+                    elif element[0] == 'p':
+                        self.PRP = self.get_listData(element)
+                    elif element[0] == 'w':
+                        self.VRC = self.get_listData(element)
 
-        if fly != "X":
-            Points = str.split(fly)
-            points = [float(Points[0]), float(Points[1]), float(Points[2])]
-            self.VRP = points
-            self.projMat = self.get_pllProjMat(1)
-            self.get_projectedVertex()
-            self.draw(canvas)
+            if not self.progenitorCam:
+                self.progenitorCam = elem
+
+            if self.cameraType == 'parallel':
+                matTemp = self.get_pllProjMat(0)
+                self.projMat.append(matTemp)
+            else:
+                matTemp = self.get_perProjMat(0)
+                self.projMat.append(matTemp)
+        #print(self.projMat[1])
+
+    def fly_camera(self, canvas, point):
+        for element in self.progenitorCam:
+            if element[0] == 'i':
+                self.cameraName = element[1]
+            elif element[0] == 't':
+                self.cameraType = element[1]
+            elif element[0] == 'r':
+                self.VRP = point
+                print(self.VRP)
+            elif element[0] == 'n':
+                self.VPN = self.get_listData(element)
+            elif element[0] == 'u':
+                self.VUP = self.get_listData(element)
+            elif element[0] == 'p':
+                self.PRP = self.get_listData(element)
+            elif element[0] == 'w':
+                self.VRC = self.get_listData(element)
+
+        if self.cameraType == 'parallel':
+            matTemp = self.get_pllProjMat(0)
+        else:
+            matTemp = self.get_perProjMat(0)
+
+        self.projMat[0] = matTemp
+        self.vertex_list = self.original_vertex_list
+        self.get_projectedVertex()
+        i = 0;
+        for element in self.vertex_list:
+            self.draw(canvas, element, self.view_dimension[i])
+            i = i + 1
 
 
 
@@ -119,7 +154,110 @@ class cl_world:
 
         tranVRP_ORJ = np.array([[1.0, 0.0, 0.0, -VRP[0]], [0.0, 1.0, 0.0, -VRP[1]], [0.0, 0.0, 1.0, -VRP[2]], [0.0, 0.0, 0.0, 1.0]])
         VRP = np.dot(tranVRP_ORJ, VRP)
-        #print(tranVRP_ORJ)
+
+        hyp = np.sqrt(VPN[1] ** 2 + VPN[2] ** 2)
+        if hyp == 0:
+            a = 1
+            b = 0
+        else:
+            a = float(VPN[2] / hyp)
+            b = float(VPN[1] / hyp)
+        Rx = np.array([[1.0, 0.0, 0.0, 0.0], [0.0, a, -b, 0.0], [0.0, -b, a, 0.0], [0.0, 0.0, 0.0, 1.0]])
+        VPN = np.dot(Rx, VPN)
+        VUP = np.dot(Rx, VUP)
+
+        hyp = np.sqrt(VPN[0] ** 2 + VPN[2] ** 2)
+        if hyp == 0: hyp = 1
+        a = float(VPN[2] / hyp)
+        b = float(VPN[0] / hyp)
+        Ry = np.array([[a, 0.0, -b, 0.0], [0.0, 1.0, 0.0, 0.0], [b, 0.0, a, 0.0], [0.0, 0.0, 0.0, 1.0]])
+        VPN = np.dot(Ry, VPN)
+        VUP = np.dot(Ry, VUP)
+
+        hyp = np.sqrt(VUP[0] ** 2 + VUP[1] ** 2)
+        if hyp == 0: hyp = 1
+        a = float(VUP[1] / hyp)
+        b = float(VUP[0] / hyp)
+
+        Rz = np.array([[a, -b, 0.0, 0.0], [b, a, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+        VPN = np.dot(Rz, VPN)
+        VUP = np.dot(Rz, VUP)
+
+        #Sheer
+        a = (-(PRP[0]-((UVN[1]+UVN[0])/2)))/PRP[2]
+        b = (-(PRP[1]-((UVN[3]+UVN[2])/2)))/PRP[2]
+
+        shear = np.array([[1, 0, a, 0], [0, 1, b, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
+
+
+        VRP = np.dot(shear, VRP)
+        PRP = np.dot(shear, PRP)
+
+        a = -(UVN[0]+UVN[1])/2
+        b = -(UVN[2]+UVN[3])/2
+        if UVN[5]>UVN[4]:
+            c = -UVN[4]
+        else:
+            c = -UVN[5]
+
+        tran2 = np.array([[1, 0, 0, a], [0, 1, 0, b], [0, 0, 1, c], [0, 0, 0, 1]])
+        VRP = np.dot(tran2, VRP)
+        PRP = np.dot(tran2, PRP)
+
+        #Scale
+        if UVN[1]>UVN[0]:
+            a = 2/(UVN[1]-UVN[0])
+        else:
+            a = 2/(UVN[0]-UVN[1])
+
+        if UVN[3]>UVN[2]:
+            b = 2/(UVN[3]-UVN[2])
+        else:
+            b = 2/(UVN[2]-UVN[3])
+
+        if UVN[5]>UVN[4]:
+            c = 1/(UVN[5]-UVN[4])
+        else:
+            c = 1/(UVN[4]-UVN[5])
+
+        scale = np.array([[a, 0, 0, 0], [0, b, 0, 0], [0, 0, c, 0], [0, 0, 0, 1]])
+
+        projMat = np.dot(Rx, tranVRP_ORJ)
+
+        projMat = np.dot(Ry, projMat)
+        projMat = np.dot(Rz, projMat)
+        projMat = np.dot(shear, projMat)
+        projMat = np.dot(tran2, projMat)
+        projMat = np.dot(scale, projMat)
+
+        return projMat
+
+    def get_perProjMat(self, flg):
+        if flg == 0:
+            VRP = self.VRP
+            VRP.append(1)
+            VPN = self.VPN
+            VPN.append(1)
+            VUP = self.VUP
+            VUP.append(1)
+            PRP = self.PRP
+            PRP.append(1)
+            UVN = self.VRC
+        else:
+            VRP = self.VRP
+            VRP.append(1)
+            VPN = self.VPN
+            VUP = self.VUP
+            PRP = self.PRP
+            UVN = self.VRC
+
+        VRP = np.array(VRP)
+        VPN = np.array(VPN)
+        VUP = np.array(VUP)
+        PRP = np.array(PRP)
+
+        tranVRP_ORJ = np.array([[1.0, 0.0, 0.0, -VRP[0]], [0.0, 1.0, 0.0, -VRP[1]], [0.0, 0.0, 1.0, -VRP[2]], [0.0, 0.0, 0.0, 1.0]])
+        VRP = np.dot(tranVRP_ORJ, VRP)
 
         hyp = np.sqrt(VPN[1] ** 2 + VPN[2] ** 2)
         if hyp == 0:
@@ -132,7 +270,6 @@ class cl_world:
         VPN = np.dot(Rx, VPN)
         VUP = np.dot(Rx, VUP)
         VRP = np.dot(Rx, VRP)
-        #print(Rx)
 
         hyp = np.sqrt(VPN[0] ** 2 + VPN[2] ** 2)
         if hyp == 0: hyp = 1
@@ -142,7 +279,6 @@ class cl_world:
         VPN = np.dot(Ry, VPN)
         VUP = np.dot(Ry, VUP)
         VRP = np.dot(Ry, VRP)
-        #print(Ry)
 
         hyp = np.sqrt(VUP[0] ** 2 + VUP[1] ** 2)
         if hyp == 0: hyp = 1
@@ -153,7 +289,6 @@ class cl_world:
         VPN = np.dot(Rz, VPN)
         VUP = np.dot(Rz, VUP)
         VRP = np.dot(Rz, VRP)
-        #print(Rz)
 
         #Translate2
         a = -PRP[0]
@@ -161,18 +296,17 @@ class cl_world:
         c = -PRP[2]
         tran2 = np.array([[1, 0, 0, a], [0, 1, 0, b], [0, 0, 1, c], [0, 0, 0, 1]])
         VRP = np.dot(tran2, VRP)
-        #print(tran2)
 
         #shear
         a = (-(PRP[0] - ((UVN[1] + UVN[0]) / 2)) / PRP[2])
         b = (-(PRP[1] - ((UVN[3] + UVN[2]) / 2)) / PRP[2])
         shear = np.array([[1, 0, a, 0], [0, 1, b, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
         VRP = np.dot(shear, VRP)
-        #print(shear)
 
         #scale
         if (np.absolute(VRP[2] + UVN[5]))> (np.absolute(VRP[2]+UVN[4])):
             a = np.absolute(VRP[2])/(((UVN[1] - UVN[0])/2)*(VRP[2]+UVN[5]))
+
         else:
             a = np.absolute(VRP[2]) / (((UVN[1] - UVN[0]) / 2) * (VRP[2] + UVN[4]))
 
@@ -184,33 +318,21 @@ class cl_world:
         if ((VRP[2]+UVN[5])*(VRP[2]+UVN[4]))<0:
             print("Error: Two sided Volume")
         elif (np.absolute(VRP[2] + UVN[5]))> (np.absolute(VRP[2]+UVN[4])):
-            c = 1/(VRP[2]+UVN[5])
+            c = 1/(VPN[2]+UVN[5])
         else:
-            c = 1/(VRP[2]+UVN[4])
+            c = 1/(VPN[2]+UVN[4])
 
         scale = np.array([[a, 0, 0, 0], [0, b, 0, 0], [0, 0, c, 0], [0, 0, 0, 1]])
-        #print(scale)
 
-        projMat = []
         projMat = np.dot(Rx, tranVRP_ORJ)
-        #print(projMat)
+
         projMat = np.dot(Ry, projMat)
-        #print(projMat)
         projMat = np.dot(Rz, projMat)
-        #print(projMat)
-        projMat = np.dot(tran2, projMat)
-        #print(projMat)
         projMat = np.dot(shear, projMat)
-        #print(projMat)
+        projMat = np.dot(tran2, projMat)
         projMat = np.dot(scale, projMat)
-        #print(projMat)
 
-        print(projMat)
         return projMat
-
-
-
-        #return projMat
 
     def get_projectedpoints(self):
         temp = []
@@ -228,14 +350,17 @@ class cl_world:
         canvas.world = self
 
     def create_graphic_objects(self, canvas, data):
+        canvas.delete("all")
         self.data = data
         self.width = canvas.cget("width")
         self.height = canvas.cget("height")
         self.create_edge_list()
         self.create_vertex_list()
-        #self.get_viewport()
-        #self.get_window()
-        self.draw(canvas)
+
+        i = 0;
+        for element in self.vertex_list:
+            self.draw(canvas, element, self.view_dimension[i])
+            i = i+1
 
     def translation(self, tPoints, canvas):
         Dx = float(tPoints[0])
@@ -243,16 +368,20 @@ class cl_world:
         Dz = float(tPoints[2])
 
         self.drawTranslation(Dx, Dy, Dz)
-        canvas.delete("all")
-        self.draw(canvas)
 
+        i = 0;
+        for element in self.vertex_list:
+            self.draw(canvas, element, self.view_dimension[i])
+            i = i + 1
 
     def drawTranslation(self, x, y, z):
-        points = np.array(self.vertex_list, dtype=float)
-        tPoints = np.array([x, y, z], dtype=float)
+        self.vertex_list = []
+        points = np.array(self.original_vertex_list, dtype=float)
+        tPoints = np.array([x, y, z, 0], dtype=float)
         translatedPoints = points + tPoints
         self.vertex_list = translatedPoints.tolist()
-
+        self.original_vertex_list = self.vertex_list
+        self.get_projectedVertex()
 
     def scaling(self, point, factor, canvas):
         factor = float(factor)
@@ -264,15 +393,24 @@ class cl_world:
         self.drawScaling(factor, canvas)
         self.drawTranslation(x, y, z)
         canvas.delete("all")
-        self.draw(canvas)
 
+        i = 0;
+        for element in self.vertex_list:
+            self.draw(canvas, element, self.view_dimension[i])
+            i = i + 1
 
     def drawScaling(self, factor, canvas):
-        Scalepoints = np.array(self.vertex_list, dtype=float)
-        sFactor = np.array([factor, factor, factor])
+        self.vertex_list = []
+        Scalepoints = np.array(self.original_vertex_list, dtype=float)
+        sFactor = np.array([factor, factor, factor, 1])
         translatedPoints = Scalepoints * sFactor
-        self.vertex_list = translatedPoints.tolist()
-        #self.draw(canvas)
+        self.original_vertex_list = translatedPoints.tolist()
+        self.vertex_list = self.original_vertex_list
+        self.get_projectedVertex()
+        i = 0;
+        for element in self.vertex_list:
+            self.draw(canvas, element, self.view_dimension[i])
+            i = i + 1
 
     def Rotate(self, A, B, line, angle, canvas):
         tempList = []
@@ -280,7 +418,7 @@ class cl_world:
 
         Mat = self.rotationMat(A, B, angle)
 
-        for element in self.vertex_list:
+        for element in self.original_vertex_list:
             element = [float(i) for i in element]
             tempList.append(element)
 
@@ -291,10 +429,16 @@ class cl_world:
             temp = temp.tolist()
             rotatedPoints.append(temp)
 
-        self.vertex_list = rotatedPoints
-        canvas.delete("all")
-        self.draw(canvas)
 
+        self.vertex_list = []
+        self.vertex_list = rotatedPoints
+        self.original_vertex_list = rotatedPoints
+        self.get_projectedVertex()
+        canvas.delete("all")
+        i = 0;
+        for element in self.vertex_list:
+            self.draw(canvas, element, self.view_dimension[i])
+            i = i + 1
 
     def rotationMat(self,N, M, angle):
         A = float(M[0]) - float(N[0])
@@ -343,38 +487,39 @@ class cl_world:
 
         return Mat
 
-    def draw(self, canvas):
-        canvas.delete("all")
-        self.translate_points()
-        self.create_draw_list()
-        a = self.view_dimension
-        dimension = self.translateViewport(a[0], a[1], a[2], a[3])
+    def draw(self, canvas, vList, vPort):
+        #canvas.delete("all")
+        tpoints = self.translate_points(vList, vPort)
+        dlist = self.create_draw_list(vList, tpoints)
 
-        self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black'))
-        for elements in self.draw_list:
+        a = vPort
+        dimension = self.translateViewport(a[0], a[1], a[2], a[3])
+        self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black', fill='white'))
+
+        for elements in dlist:
             self.objects.append(canvas.create_line(elements))
 
     def create_vertex_list(self):
         self.vertex_list = []
+        temp = []
         for element in self.data:
             if element[0] == 'v':
-                self.vertex_list.append([float(element[1]), float(element[2]), float(element[3]), 1.0])
-        self.original_vertex_list = self.vertex_list
+                temp.append([float(element[1]), float(element[2]), float(element[3]), 1.0])
+        self.original_vertex_list = temp
         self.get_projectedVertex()
 
-
     def get_projectedVertex(self):
-        temp = []
-        mat = self.projMat
-        for element in self.original_vertex_list:
-            element = np.array(element)
-            element = np.dot(mat, element)
-            element = element.tolist()
-            temp.append(element)
-
-        self.vertex_list = temp
-
-
+        vertTemp = []
+        for element in self.projMat:
+            mat = element
+            temp = []
+            for element1 in self.original_vertex_list:
+                element1 = np.array(element1)
+                element1 = np.dot(mat, element1)
+                element1 = element1.tolist()
+                temp.append(element1)
+            vertTemp.append(temp)
+        self.vertex_list = vertTemp
 
     def create_edge_list(self):
         self.edge_list = []
@@ -395,15 +540,16 @@ class cl_world:
         self.viewFrameDimensions = dimensions
         return dimensions
 
-    def translate_points(self):
-        self.translated_points = []
-        for element in self.vertex_list:
-            temp = self.translate_coordinate(element[0], element[1])
-            self.translated_points.append(temp)
+    def translate_points(self, vList, vPort):
+        translated_points = []
+        for element in vList:
+            temp = self.translate_coordinate(element[0], element[1], vPort)
+            translated_points.append(temp)
+        return translated_points
 
-    def translate_coordinate(self, pwx, pwy):
+    def translate_coordinate(self, pwx, pwy, vd):
         a = self.window_dimension
-        b = self.view_dimension
+        b = vd
 
         pwx = float(pwx)
         pwy = float(pwy)
@@ -431,9 +577,9 @@ class cl_world:
 
         return [psx, psy]
 
-    def create_draw_list(self):
-        self.draw_list = []
-        l = self.translated_points
+    def create_draw_list(self, vList, tList):
+        dlist = []
+        l = tList
         clip = []
         for elements in self.edge_list:
             if elements[0] == 'f':
@@ -450,15 +596,16 @@ class cl_world:
                 point1 = l[x]
                 point2 = l[y]
 
-                p1 = self.vertex_list[x]
-                p2 = self.vertex_list[y]
+                p1 = vList[x]
+                p2 = vList[y]
 
 
                 clip = self.clip_line_parallel(p1, p2)
 
                 if clip != []:
                     temp = [point1[0], point1[1], point2[0], point2[1]]
-                    self.draw_list.append(temp)
+                    dlist.append(temp)
+        return dlist
 
     def assign_parallel_outcode(self, x, y, z):
         outcode = 0b000000
@@ -496,7 +643,6 @@ class cl_world:
             if input_point_1_outcode & input_point_2_outcode:
                 return []
             if not (input_point_1_outcode | input_point_2_outcode):
-                # print 'result' , [[x1,y1,z1],[x2,y2,z2]]
                 return [[x1, y1, z1], [x2, y2, z2]]
             if input_point_1_outcode:
                 outcode = input_point_1_outcode
@@ -548,11 +694,15 @@ class cl_world:
 
             canvas.delete("all")
 
-            self.translate_points()
-            self.create_draw_list()
+            i = 0;
+            for element in self.vertex_list:
+                self.draw(canvas, element, self.view_dimension[i])
+                i = i + 1
 
-            a = self.view_dimension
-            dimension = self.translateViewport(a[0], a[1], a[2], a[3])
-            self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black'))
+            #self.translate_points()
+            #self.create_draw_list()
+            for a in self.view_dimension:
+                dimension = self.translateViewport(a[0], a[1], a[2], a[3])
+                self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black'))
             for elements in self.draw_list:
                 self.objects.append(canvas.create_polygon(elements, outline='black', fill='red'))
