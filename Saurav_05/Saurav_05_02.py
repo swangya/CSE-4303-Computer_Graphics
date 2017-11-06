@@ -1,7 +1,7 @@
 # Saurav, Swangya
 # 1001-054-908
-# 2017-10-26
-# Assignment_04_02
+# 2017-11-06
+# Assignment_05_02
 
 
 import tkinter as tk
@@ -28,7 +28,7 @@ class cl_widgets:
         self.statusBar_frame.pack(side=tk.BOTTOM, fill=tk.X)
         self.statusBar_frame.set('%s', 'This is the status bar')
 
-        filename = "cameras.txt"
+        filename = "cameras_05.txt"
         with open(filename) as textFile:
             lines = [line.split() for line in textFile]
         list = [x for x in lines if x != []]

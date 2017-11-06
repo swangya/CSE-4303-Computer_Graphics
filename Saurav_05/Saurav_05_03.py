@@ -1,7 +1,7 @@
 # Saurav, Swangya
 # 1001-054-908
-# 2017-10-26
-# Assignment_04_03
+# 2017-11-06
+# Assignment_05_03
 
 import numpy as np
 
@@ -35,6 +35,11 @@ class cl_world:
         self.VRC = [-1, 1, -1, 1, -1, 1]
         self.viewPort = [0.1, 0.1, 0.4, 0.4]
         self.projMat = []
+
+        #Assignment 5 variables
+        self.bezier_list = []
+        self.bezier_points = []
+        self.init_res = 0
 
     def put_cameras(self, data, canvas):
         self.camData = data
@@ -116,8 +121,6 @@ class cl_world:
         for element in self.vertex_list:
             self.draw(canvas, element, self.view_dimension[i])
             i = i + 1
-
-
 
     def get_listData(self, list):
         retList = []
@@ -349,18 +352,6 @@ class cl_world:
         self.canvases.append(canvas)
         canvas.world = self
 
-    def create_graphic_objects(self, canvas, data):
-        canvas.delete("all")
-        self.data = data
-        self.width = canvas.cget("width")
-        self.height = canvas.cget("height")
-        self.create_edge_list()
-        self.create_vertex_list()
-
-        i = 0;
-        for element in self.vertex_list:
-            self.draw(canvas, element, self.view_dimension[i])
-            i = i+1
 
     def translation(self, tPoints, canvas):
         Dx = float(tPoints[0])
@@ -487,6 +478,19 @@ class cl_world:
 
         return Mat
 
+    def create_graphic_objects(self, canvas, data):
+        canvas.delete("all")
+        self.data = data
+        self.width = canvas.cget("width")
+        self.height = canvas.cget("height")
+        self.create_edge_list()
+        self.create_vertex_list()
+
+        i = 0;
+        for element in self.vertex_list:
+            self.draw(canvas, element, self.view_dimension[i])
+            i = i+1
+
     def draw(self, canvas, vList, vPort):
         #canvas.delete("all")
         tpoints = self.translate_points(vList, vPort)
@@ -501,12 +505,69 @@ class cl_world:
 
     def create_vertex_list(self):
         self.vertex_list = []
+        self.bezier_list = []
         temp = []
+        temp1 = []
         for element in self.data:
+            if element[0] == 'n':
+                self.init_res = int(element[1])
             if element[0] == 'v':
                 temp.append([float(element[1]), float(element[2]), float(element[3]), 1.0])
+            if element[0] == 'b':
+                temp1.append([float(element[1]), float(element[2]), float(element[3])])
+        self.bezier_list = temp1
         self.original_vertex_list = temp
+        self.get_bezier_points()
         self.get_projectedVertex()
+
+    def get_bezier_points(self):
+        total = len(self.bezier_list)
+        bezier_P_list = []
+        temp = []
+        for i in range(0, total, 4):
+            temp = []
+            for j in range(i, (i+4)):
+                temp.append(self.bezier_list[j])
+            bezier_P_list.append(temp)
+
+        #Bernstein basis functions
+        uinc = 1.0/float(self.init_res)
+        u = uinc;
+        B = []
+        B0 = []
+        B1 = []
+        B2 = []
+        B3 = []
+
+        for i in range(0, self.init_res):
+            u_sqr = np.square(u)
+            tmp = 1.0 - u
+            tmp_sqr = np.square(tmp)
+            B0.append(tmp * tmp_sqr)
+            B1.append(3 * u * tmp_sqr)
+            B2.append(3 * u_sqr * tmp)
+            B3.append(u * u_sqr)
+            u = u+uinc
+        B.append(B0)
+        B.append(B1)
+        B.append(B2)
+        B.append(B3)
+
+        
+
+
+    '''
+    def get_b_surface_points(self, Plist):
+        M = np.array([[1.0, 0.0, 0.0, 0.0], [-3.0, 3.0, 0.0, 0.0], [3.0, -6.0, 3.0, 0.0], [-1.0, 3.0, -3.0, 1.0]])
+        t0 = np.array([1.0, 0.0, 0.0, 0.0])
+        t1 = np.array([1.0, 1.0, 1.0, 1.0])
+        P = np.array(Plist)
+
+        Point0 = t0.dot(M.dot(P))
+        Point1 = t1.dot(M.dot(P))
+
+        return [Point0.tolist(), Point1.tolist()]
+    '''
 
     def get_projectedVertex(self):
         vertTemp = []
