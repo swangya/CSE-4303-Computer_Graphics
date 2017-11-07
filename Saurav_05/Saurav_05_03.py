@@ -91,7 +91,6 @@ class cl_world:
             else:
                 matTemp = self.get_perProjMat(0)
                 self.projMat.append(matTemp)
-        #print(self.projMat[1])
 
     def fly_camera(self, canvas, point):
         for element in self.progenitorCam:
@@ -101,7 +100,6 @@ class cl_world:
                 self.cameraType = element[1]
             elif element[0] == 'r':
                 self.VRP = point
-                #print(self.VRP)
             elif element[0] == 'n':
                 self.VPN = self.get_listData(element)
             elif element[0] == 'u':
@@ -487,6 +485,7 @@ class cl_world:
         self.height = canvas.cget("height")
         self.create_edge_list()
         self.create_vertex_list()
+        self.create_bezier_list()
         self.get_bezier_points()
 
         i = 0
@@ -510,17 +509,25 @@ class cl_world:
         self.vertex_list = []
         self.bezier_list = []
         temp = []
-        temp1 = []
         for element in self.data:
             if element[0] == 'n':
                 self.init_res = int(element[1])
             if element[0] == 'v':
                 temp.append([float(element[1]), float(element[2]), float(element[3]), 1.0])
-            if element[0] == 'b':
-                temp1.append([float(element[1]), float(element[2]), float(element[3])])
-        self.bezier_list = temp1
         self.original_vertex_list = temp
         self.get_projectedVertex()
+
+    def create_bezier_list(self):
+        temp1 = []
+        counter1 = 0
+        counter2 = 0
+        for element in self.data:
+            counter1 = counter1 + 1;
+            if element[0] == 'b':
+                temp1.append([float(element[1]), float(element[2]), float(element[3])])
+                counter2 = counter2 + 1
+        self.bezier_list = temp1
+        print("====>", len(self.bezier_list))
 
     def get_bezier_points(self):
         lim = self.init_res
@@ -536,8 +543,8 @@ class cl_world:
         self.bezier_P_List = bezier_P_list
         P_length = len(bezier_P_list)
 
-        for i in range(0, P_length, 16):
-            end = i +16
+        for i in range(0, P_length, 4):
+            end = i + 4
             self.create_bezier_surface(bezier_P_list[i:end], lim)
 
     def bezier_increase_res(self, canvas):
@@ -553,7 +560,7 @@ class cl_world:
             end = i + 16
             self.create_bezier_surface(bezier_P_list[i:end], lim)
 
-        canvas.delete("all")
+        canvas.delete()
         i = 0
         for element in self.vertex_list:
             self.draw(canvas, element, self.view_dimension[i])
@@ -582,7 +589,6 @@ class cl_world:
         lim = lim+1
         #Bernstein basis functions
         uinc = 1.0/float(self.init_res)
-        #u = uinc
         u = 0
         B = []
         B0 = []
@@ -604,11 +610,10 @@ class cl_world:
         B.append(B1)
         B.append(B2)
         B.append(B3)
-        print(B)
+
 
 
         point = []
-        temp = []
         for i in range(0, lim):
             a1 = self.Curve(i, [bezier_P_list[0][0], bezier_P_list[1][0], bezier_P_list[2][0], bezier_P_list[3][0]], B)
             a2 = self.Curve(i, [bezier_P_list[0][1], bezier_P_list[1][1], bezier_P_list[2][1], bezier_P_list[3][1]], B)
