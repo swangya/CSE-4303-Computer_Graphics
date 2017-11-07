@@ -77,8 +77,8 @@ class cl_canvas_frame:
         self.canvas.bind("<Shift-Down>", self.shift_down_arrow_pressed_callback)
         self.canvas.bind("<Shift-Right>", self.shift_right_arrow_pressed_callback)
         self.canvas.bind("<Shift-Left>", self.shift_left_arrow_pressed_callback)
-        self.canvas.bind("f", self.f_key_pressed_callback)
-        self.canvas.bind("b", self.b_key_pressed_callback)
+        self.canvas.bind("R", self.R_key_pressed_callback)
+        self.canvas.bind("r", self.r_key_pressed_callback)
 
     def key_pressed_callback(self, event):
         self.master.statusBar_frame.set('%s','Key pressed')
@@ -107,11 +107,13 @@ class cl_canvas_frame:
     def shift_left_arrow_pressed_callback(self, event):
         self.master.statusBar_frame.set('%s',"Shift left arrow was pressed")
 
-    def f_key_pressed_callback(self, event):
-        self.master.statusBar_frame.set('%s',"f key was pressed")
+    def R_key_pressed_callback(self, event):
+        self.master.ob_canvas_frame.canvas.delete("all")
+        self.master.ob_world.bezier_increase_res(self.master.ob_canvas_frame.canvas)
 
-    def b_key_pressed_callback(self, event):
-        self.master.statusBar_frame.set('%s',"b key was pressed")
+    def r_key_pressed_callback(self, event):
+        self.master.ob_canvas_frame.canvas.delete("all")
+        self.master.ob_world.bezier_decrease_res(self.master.ob_canvas_frame.canvas)
 
     def left_mouse_click_callback(self, event):
         self.master.statusBar_frame.set('%s','Left mouse button was clicked. '+ \

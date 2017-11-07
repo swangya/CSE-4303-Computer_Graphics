@@ -40,6 +40,8 @@ class cl_world:
         self.bezier_list = []
         self.bezier_points = []
         self.init_res = 0
+        self.line_list = []
+        self.bezier_P_List = []
 
     def put_cameras(self, data, canvas):
         self.camData = data
@@ -99,7 +101,7 @@ class cl_world:
                 self.cameraType = element[1]
             elif element[0] == 'r':
                 self.VRP = point
-                print(self.VRP)
+                #print(self.VRP)
             elif element[0] == 'n':
                 self.VPN = self.get_listData(element)
             elif element[0] == 'u':
@@ -485,8 +487,9 @@ class cl_world:
         self.height = canvas.cget("height")
         self.create_edge_list()
         self.create_vertex_list()
+        self.get_bezier_points()
 
-        i = 0;
+        i = 0
         for element in self.vertex_list:
             self.draw(canvas, element, self.view_dimension[i])
             i = i+1
@@ -517,10 +520,10 @@ class cl_world:
                 temp1.append([float(element[1]), float(element[2]), float(element[3])])
         self.bezier_list = temp1
         self.original_vertex_list = temp
-        self.get_bezier_points()
         self.get_projectedVertex()
 
     def get_bezier_points(self):
+        lim = self.init_res
         total = len(self.bezier_list)
         bezier_P_list = []
         temp = []
@@ -530,16 +533,65 @@ class cl_world:
                 temp.append(self.bezier_list[j])
             bezier_P_list.append(temp)
 
+        self.bezier_P_List = bezier_P_list
+        P_length = len(bezier_P_list)
+
+        for i in range(0, P_length, 16):
+            end = i +16
+            self.create_bezier_surface(bezier_P_list[i:end], lim)
+
+    def bezier_increase_res(self, canvas):
+        lim = self.init_res
+        lim = lim +1
+        if lim > 100:
+            lim = 100
+        self.init_res = lim
+        bezier_P_list = self.bezier_P_List
+        P_length = len(bezier_P_list)
+
+        for i in range(0, P_length, 16):
+            end = i + 16
+            self.create_bezier_surface(bezier_P_list[i:end], lim)
+
+        canvas.delete("all")
+        i = 0
+        for element in self.vertex_list:
+            self.draw(canvas, element, self.view_dimension[i])
+            i = i + 1
+
+    def bezier_decrease_res(self, canvas):
+        lim = self.init_res
+        lim = lim - 1
+        if lim < 2:
+            lim = 2
+        self.init_res = lim
+        bezier_P_list = self.bezier_P_List
+        P_length = len(bezier_P_list)
+
+        for i in range(0, P_length, 16):
+            end = i + 16
+            self.create_bezier_surface(bezier_P_list[i:end], lim)
+
+        canvas.delete("all")
+        i = 0
+        for element in self.vertex_list:
+            self.draw(canvas, element, self.view_dimension[i])
+            i = i + 1
+
+    def create_bezier_surface(self, bezier_P_list, lim):
+        lim = lim+1
         #Bernstein basis functions
         uinc = 1.0/float(self.init_res)
-        u = uinc;
+        #u = uinc
+        u = 0
         B = []
         B0 = []
         B1 = []
         B2 = []
         B3 = []
 
-        for i in range(0, self.init_res):
+
+        for i in range(0, lim):
             u_sqr = np.square(u)
             tmp = 1.0 - u
             tmp_sqr = np.square(tmp)
@@ -552,22 +604,51 @@ class cl_world:
         B.append(B1)
         B.append(B2)
         B.append(B3)
+        print(B)
 
-        
+
+        point = []
+        temp = []
+        for i in range(0, lim):
+            a1 = self.Curve(i, [bezier_P_list[0][0], bezier_P_list[1][0], bezier_P_list[2][0], bezier_P_list[3][0]], B)
+            a2 = self.Curve(i, [bezier_P_list[0][1], bezier_P_list[1][1], bezier_P_list[2][1], bezier_P_list[3][1]], B)
+            a3 = self.Curve(i, [bezier_P_list[0][2], bezier_P_list[1][2], bezier_P_list[2][2], bezier_P_list[3][2]], B)
+            a4 = self.Curve(i, [bezier_P_list[0][3], bezier_P_list[1][3], bezier_P_list[2][3], bezier_P_list[3][3]], B)
+            for j in range(0, lim):
+                temp = []
+                temp = self.Curve(j, [a1, a2, a3, a4], B)
+                point.append(temp)
+
+        n = len(self.original_vertex_list)
+        temp = []
+        for e in point:
+            e = e + [1.0]
+            temp.append(e)
+            self.original_vertex_list.append(e)
+        point = temp
+
+        lineList = []
+        for i in range((lim*lim)-1):
+            n1 = i+1
+            if n1%lim != 0:
+                lineList.append([(i + n), (n1 + n)])
+            n1 = i + lim
+            if n1 < lim**2:
+                lineList.append([(i + n), (n1 + n)])
+            n1 = i + lim + 1
+            if n1 < lim ** 2 and n1 % lim != 0:
+                lineList.append([(i + n), (n1 + n)])
+
+        self.line_list = self.line_list + lineList
+        self.get_projectedVertex()
 
 
-    '''
-    def get_b_surface_points(self, Plist):
-        M = np.array([[1.0, 0.0, 0.0, 0.0], [-3.0, 3.0, 0.0, 0.0], [3.0, -6.0, 3.0, 0.0], [-1.0, 3.0, -3.0, 1.0]])
-        t0 = np.array([1.0, 0.0, 0.0, 0.0])
-        t1 = np.array([1.0, 1.0, 1.0, 1.0])
-        P = np.array(Plist)
-
-        Point0 = t0.dot(M.dot(P))
-        Point1 = t1.dot(M.dot(P))
-
-        return [Point0.tolist(), Point1.tolist()]
-    '''
+    def Curve(self, t, c, B):
+        c = np.array(c)
+        a = []
+        curve = np.multiply(c[0], B[0][t]) + np.multiply(c[1], B[1][t]) + np.multiply(c[2], B[2][t]) + np.multiply(c[3], B[3][t])
+        temp = np .add(np.multiply(c[0], B[0][t]), np.add(np.multiply(c[1], B[1][t]), np.add(np.multiply(c[2], B[2][t]), np.multiply(c[3], B[3][t]))))
+        return curve.tolist()
 
     def get_projectedVertex(self):
         vertTemp = []
@@ -660,6 +741,22 @@ class cl_world:
                 p1 = vList[x]
                 p2 = vList[y]
 
+
+                clip = self.clip_line_parallel(p1, p2)
+
+                if clip != []:
+                    temp = [point1[0], point1[1], point2[0], point2[1]]
+                    dlist.append(temp)
+        if self.line_list:
+            for element in self.line_list:
+                x = element[0]
+                y = element[1]
+
+                point1 = l[x]
+                point2 = l[y]
+
+                p1 = vList[x]
+                p2 = vList[y]
 
                 clip = self.clip_line_parallel(p1, p2)
 
