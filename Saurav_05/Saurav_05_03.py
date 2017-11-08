@@ -479,15 +479,14 @@ class cl_world:
         return Mat
 
     def create_graphic_objects(self, canvas, data):
-        canvas.delete("all")
         self.data = data
         self.width = canvas.cget("width")
         self.height = canvas.cget("height")
         self.create_edge_list()
         self.create_vertex_list()
         self.create_bezier_list()
-        self.get_bezier_points()
-
+        self.get_bezier_points(self.init_res)
+        canvas.delete("all")
         i = 0
         for element in self.vertex_list:
             self.draw(canvas, element, self.view_dimension[i])
@@ -499,6 +498,7 @@ class cl_world:
         dlist = self.create_draw_list(vList, tpoints)
 
         a = vPort
+
         dimension = self.translateViewport(a[0], a[1], a[2], a[3])
         self.objects.append(canvas.create_rectangle(dimension[0], dimension[1], dimension[2], dimension[3], outline='black', fill='white'))
 
@@ -527,10 +527,8 @@ class cl_world:
                 temp1.append([float(element[1]), float(element[2]), float(element[3])])
                 counter2 = counter2 + 1
         self.bezier_list = temp1
-        print("====>", len(self.bezier_list))
 
-    def get_bezier_points(self):
-        lim = self.init_res
+    def get_bezier_points(self, lim):
         total = len(self.bezier_list)
         bezier_P_list = []
         temp = []
@@ -548,39 +546,50 @@ class cl_world:
             self.create_bezier_surface(bezier_P_list[i:end], lim)
 
     def bezier_increase_res(self, canvas):
+        self.bezier_list = []
+        self.bezier_points = []
+        self.line_list = []
+        self.bezier_P_List = []
+
+        self.create_bezier_list()
+
         lim = self.init_res
         lim = lim +1
+        self.init_res = lim
+
         if lim > 100:
             lim = 100
         self.init_res = lim
-        bezier_P_list = self.bezier_P_List
-        P_length = len(bezier_P_list)
 
-        for i in range(0, P_length, 16):
-            end = i + 16
-            self.create_bezier_surface(bezier_P_list[i:end], lim)
+        self.get_bezier_points(lim)
 
-        canvas.delete()
-        i = 0
+        canvas.delete("all")
+        i = 0;
         for element in self.vertex_list:
             self.draw(canvas, element, self.view_dimension[i])
             i = i + 1
 
     def bezier_decrease_res(self, canvas):
+        self.bezier_list = []
+        self.bezier_points = []
+        self.line_list = []
+        self.bezier_P_List = []
+
+        self.create_bezier_list()
+
         lim = self.init_res
         lim = lim - 1
-        if lim < 2:
-            lim = 2
         self.init_res = lim
-        bezier_P_list = self.bezier_P_List
-        P_length = len(bezier_P_list)
 
-        for i in range(0, P_length, 16):
-            end = i + 16
-            self.create_bezier_surface(bezier_P_list[i:end], lim)
+
+        if lim < 1:
+            lim = 1
+        self.init_res = lim
+
+        self.get_bezier_points(lim)
 
         canvas.delete("all")
-        i = 0
+        i = 0;
         for element in self.vertex_list:
             self.draw(canvas, element, self.view_dimension[i])
             i = i + 1
@@ -588,7 +597,7 @@ class cl_world:
     def create_bezier_surface(self, bezier_P_list, lim):
         lim = lim+1
         #Bernstein basis functions
-        uinc = 1.0/float(self.init_res)
+        uinc = 1.0/float(lim-1)
         u = 0
         B = []
         B0 = []

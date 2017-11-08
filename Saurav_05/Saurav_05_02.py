@@ -108,11 +108,9 @@ class cl_canvas_frame:
         self.master.statusBar_frame.set('%s',"Shift left arrow was pressed")
 
     def R_key_pressed_callback(self, event):
-        self.master.ob_canvas_frame.canvas.delete("all")
         self.master.ob_world.bezier_increase_res(self.master.ob_canvas_frame.canvas)
 
     def r_key_pressed_callback(self, event):
-        self.master.ob_canvas_frame.canvas.delete("all")
         self.master.ob_world.bezier_decrease_res(self.master.ob_canvas_frame.canvas)
 
     def left_mouse_click_callback(self, event):
