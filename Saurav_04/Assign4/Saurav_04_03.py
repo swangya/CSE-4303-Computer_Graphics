@@ -599,8 +599,8 @@ class cl_world:
                 p1 = vList[x]
                 p2 = vList[y]
 
-
                 clip = self.clip_line_parallel(p1, p2)
+
 
                 if clip != []:
                     temp = [point1[0], point1[1], point2[0], point2[1]]
