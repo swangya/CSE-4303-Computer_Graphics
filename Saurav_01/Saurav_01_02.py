@@ -16,8 +16,8 @@ class cl_widgets:
         self.ob_world = ob_world
         self.menu = cl_menu(self)
         self.toolbar = cl_toolbar(self)
-        #self.buttons_panel_01 = cl_buttons_panel_01(self)
-        #self.buttons_panel_02 = cl_buttons_panel_02(self)
+        self.buttons_panel_01 = cl_buttons_panel_01(self)
+        self.buttons_panel_02 = cl_buttons_panel_02(self)
         # Added status bar. Kamangar 2017_08_26
         self.statusBar_frame = cl_statusBar_frame(self.ob_root_window)
         self.statusBar_frame.pack(side=tk.BOTTOM, fill=tk.X)
