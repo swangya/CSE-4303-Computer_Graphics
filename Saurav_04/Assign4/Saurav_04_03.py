@@ -94,7 +94,6 @@ class cl_world:
                 self.cameraType = element[1]
             elif element[0] == 'r':
                 self.VRP = point
-                print(self.VRP)
             elif element[0] == 'n':
                 self.VPN = self.get_listData(element)
             elif element[0] == 'u':
@@ -550,8 +549,6 @@ class cl_world:
     def translate_coordinate(self, pwx, pwy, vd):
         a = self.window_dimension
         b = vd
-        print(a)
-        print(b)
 
         pwx = float(pwx)
         pwy = float(pwy)
