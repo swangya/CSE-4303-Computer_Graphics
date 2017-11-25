@@ -550,6 +550,8 @@ class cl_world:
     def translate_coordinate(self, pwx, pwy, vd):
         a = self.window_dimension
         b = vd
+        print(a)
+        print(b)
 
         pwx = float(pwx)
         pwy = float(pwy)
@@ -599,8 +601,8 @@ class cl_world:
                 p1 = vList[x]
                 p2 = vList[y]
 
-                clip = self.clip_line_parallel(p1, p2)
 
+                clip = self.clip_line_parallel(p1, p2)
 
                 if clip != []:
                     temp = [point1[0], point1[1], point2[0], point2[1]]
