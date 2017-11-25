@@ -580,6 +580,7 @@ class cl_world:
         dlist = []
         l = tList
         clip = []
+        print(vList)
         for elements in self.edge_list:
             if elements[0] == 'f':
                 elements.pop(0)
