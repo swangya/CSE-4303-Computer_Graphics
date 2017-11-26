@@ -595,7 +595,6 @@ class cl_world:
             i = i + 1
 
     def create_bezier_surface(self, bezier_P_list, lim):
-        print("this Runs")
         lim = lim+1
         #Bernstein basis functions
         uinc = 1.0/float(lim-1)
